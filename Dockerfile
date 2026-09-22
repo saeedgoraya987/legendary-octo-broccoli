@@ -1,12 +1,9 @@
-# Dockerfile
-FROM node:20-slim
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      git ca-certificates python3 make g++ \
-    && rm -rf /var/lib/apt/lists/*
+
+FROM python:3.11-slim
 WORKDIR /app
-COPY package.json ./
-RUN npm install --omit=dev
-COPY server.mjs ./
-ENV NODE_ENV=production
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY main.py ./
+ENV PYTHONUNBUFFERED=1
 EXPOSE 3000
-CMD ["node", "server.mjs"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-3000}"]
